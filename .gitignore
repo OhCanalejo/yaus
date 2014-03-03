@@ -1,6 +1,49 @@
+# -- Java  ---------------------------
+
 *.class
 
-# Package Files #
+# Package Files
 *.jar
 *.war
 *.ear
+*.db
+
+
+# -- Eclipse --------------------------------
+
+.project
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+*.launch
+.buildpath
+
+# -- Maven ----------------------------------
+/target
+
+
+# -- Operative Systems ----------------------
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.*
+!.gitignore
+*~
+
+# MAC OS
+.DS_Store
+
