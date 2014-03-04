@@ -1,6 +1,5 @@
 package com.yaus.occ;
 
-import java.security.Provider.Service;
 import java.util.Locale;
 
 import org.slf4j.Logger;
@@ -8,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,14 +41,32 @@ public class HomeController {
 		return "home";
 	}
 
+	
+	/**
+	 * Test shortened URL
+	 * @param url
+	 * @return checks if URL is registered. If yes then redirects user to the original URL
+	 */
+	@RequestMapping(value = "/go", method = RequestMethod.GET)
+	public String testURL(Locale locale, @RequestParam(value="url") String url) {
+		
+		logger.info("Test Requested for URL {}", url);
+		
+		String unveiledURL = yausService.unveilURL(url);
+		
+		return "redirect:" + unveiledURL;
+	}
+	
 	/**
 	 * Shortens a given URL
 	 * @param url
 	 * @return the shortened URL
 	 */
-	@RequestMapping(value = "/short", method = RequestMethod.GET)
+	@RequestMapping(value = "/shorten", method = RequestMethod.GET)
 	public String shortenURL(Locale locale, Model model, 
 							@RequestParam(value="url") String url) {
+		
+		logger.info("Shorten Requested for URL {}", url);
 		
 		String shortURL = yausService.shortenURL(url);
 		
@@ -64,6 +82,8 @@ public class HomeController {
 	@RequestMapping(value = "/unveil", method = RequestMethod.GET)
 	public String unveilURL(Locale locale, Model model, 
 							@RequestParam(value="url") String url) {
+		
+		logger.info("Unveiling Requested for URL {}", url);
 		
 		String unveiledURL = yausService.unveilURL(url);
 		
