@@ -36,7 +36,7 @@
 		<!-- Enlarge -->
 		<form action="enlarge" method="GET" autocomplete="off" id="enlarge_form">
 			<div class="enlarge_form">  
-				<label for="url">type or paste here the key of your short url</label>
+				<label for="url">type or paste here <strong>the key</strong> of your short url</label>
 				<input type="text" name="key" id="key" required="required" />
 				<c:if test="${yausURL != null}" > 
 					<div>
