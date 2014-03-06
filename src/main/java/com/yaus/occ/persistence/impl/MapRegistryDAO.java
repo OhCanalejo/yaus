@@ -7,7 +7,7 @@ import com.yaus.occ.model.YausURL;
 import com.yaus.occ.persistence.RegistryDAO;
 
 /**
- * An in-memory implementation of the URL Registry DAO
+ * An in-memory persistence implementation  
  * 
  * @author oscar.canalejo
  *

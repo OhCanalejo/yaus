@@ -12,6 +12,10 @@ import com.yaus.occ.model.YausURL;
 import com.yaus.occ.persistence.RegistryDAO;
 import com.yaus.occ.service.YausService;
 
+/**
+ * @author oscar.canalejo
+ *
+ */
 public class DefaultYausService implements YausService {
 
 	@Autowired
