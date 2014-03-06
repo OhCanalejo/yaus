@@ -1,13 +1,13 @@
 package com.yaus.occ;
 
+import java.net.URI;
 import java.util.Locale;
 
-import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,10 +28,10 @@ public class HomeController {
 	
 	@Autowired
 	YausService yausService;
-	@Autowired
-	ServletContext servletContext;
 	
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+	private static final String BASE_URL = "http://127.0.0.1:8080";
+	
 	
 	/**
 	 * Home/Main view
@@ -42,17 +42,16 @@ public class HomeController {
 		logger.info("there's no place like home");
 		return "home";
 	}
-
 	
 	/**
 	 * Receives a short URL and 
-	 * Redirects to its related long URL.
+	 * Redirects user to its related long URL.
 	 * (If key is found in our registry)
 	 * @param url
-	 * @return checks if URL is registered. If yes then redirects user to the original URL
+	 * @return Navigation redirection to the original long URL (if it's registered) 
 	 */
 	@RequestMapping(value = "/{key}", method = RequestMethod.GET)
-	public String testURL(Locale locale, @PathVariable(value="key") String key) {
+	public String testURL(Locale locale, Model model, @PathVariable(value="key") String key) {
 		
 		logger.info("Redirection Requested for long URL with key {}", key);
 		
@@ -61,6 +60,7 @@ public class HomeController {
 			yausURL.incrementClickCount();
 			return "redirect:" + yausURL.getLongURL();	
 		}else {
+			model.addAttribute("enlarge_error", "Sorry, No URL found for the key " + key);
 			return "home";
 		}
 		
@@ -68,17 +68,18 @@ public class HomeController {
 	
 	/**
 	 * Shortens a given URL
-	 * @param url
+	 * @param url the long url
 	 * @return the shortened URL
 	 */
 	@RequestMapping(value = "/shorten", method = RequestMethod.GET)
-	public String shortenURL(Locale locale, Model model, 
+	public String shortenURL(Locale locale, Model model, HttpServletRequest request,
 							@RequestParam(value="url") String url) {
 		
 		logger.info("Shorten Requested for URL {}", url);
 		try {
 			YausURL yausURL = yausService.shortenURL(url);
-			model.addAttribute("shortenedURL", yausURL.getKey());
+			model.addAttribute("shortenedURL", BASE_URL +  
+					request.getContextPath() + "/" + yausURL.getKey());
 		
 		} catch (IllegalArgumentException ex) {
 			logger.error("Error occurred. {}",ex);
@@ -88,16 +89,16 @@ public class HomeController {
 	}
 
 	/**
-	 * Receives a shortened URL key and gets the original long one  
-	 * @param url the key for a shortened URL
+	 * Receives a short URL and gets the original long one  
+	 * @param url the short URL
 	 * @return the original, non shortened URL 
 	 */
-	@RequestMapping(value = "/enlarge", method = RequestMethod.GET)
-	public String getLongURL(Locale locale, Model model, 
-							@RequestParam(value="key") String key) {
+	@RequestMapping(value = "/getLongURL", method = RequestMethod.GET)
+	public String getLongURL(Locale locale, Model model, HttpServletRequest request,
+							@RequestParam(value="short_url") String url) {
 		
-		logger.info("Enlarge Requested for key {}", key);
-		
+		logger.info("Long URL requested for {}", url);
+		String key = this.extractKey(request.getContextPath(), url);
 		YausURL yausURL = yausService.unveilURL(key);
 		if (yausURL != null){
 			model.addAttribute("yausURL", yausURL);
@@ -105,6 +106,23 @@ public class HomeController {
 			model.addAttribute("enlarge_error", "Not Found");
 		}
 		return "home";
+	}
+	
+	/**
+	 * Extract the 'key' part from a URL
+	 * @param url
+	 * @return the key part, or null if something went wrong
+	 */
+	private String extractKey(String contextPath, String url) {
+		try {
+			URI uri = new URI(url);
+			String key = uri.getPath().substring(contextPath.length()+1);
+			return key;
+		} catch (Exception ex) {
+			logger.error("Error extracting key from url {} ",url,ex);
+			return null;
+		}
+		
 	}
 	
 }

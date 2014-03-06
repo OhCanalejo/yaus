@@ -13,11 +13,12 @@
 		<!-- Shorten -->
 		<form action="shorten" method="GET" autocomplete="off" id="shorten_form">
 			<div class="shorten_form">  
-				<label for="url">type or paste here your long url</label>
+				<label for="url">type or paste here <strong>your long url</strong></label>
 				<input type="text" name="url" id="url" required="required" />
+				<button id="shorten" type="submit">Shorten It!</button>
 				<c:if test="${shortenedURL != null}" > 
 					<div>
-						<label>Here it is! your shortened url: <strong>${shortenedURL}</strong></label> 
+						<label>This is the shortened url generated: <a href="${shortenedURL}">${shortenedURL}</a></label> 
 					</div> 
 				</c:if> 
 				<c:if test="${shorten_error != null}" > 
@@ -26,18 +27,14 @@
 					</div> 
 				</c:if> 
 			</div>
-			<div class="actions">
-				<div class="action">
-					<button id="shorten" type="submit">Shorten It!</button>
-				</div>
-			</div>
 		</form>
 		
 		<!-- Enlarge -->
-		<form action="enlarge" method="GET" autocomplete="off" id="enlarge_form">
+		<form action="getLongURL" method="GET" autocomplete="off" id="enlarge_form">
 			<div class="enlarge_form">  
-				<label for="url">type or paste here <strong>the key</strong> of your short url</label>
-				<input type="text" name="key" id="key" required="required" />
+				<label for="short_url">type or paste here <strong>your short url</strong></label>
+				<input type="text" name="short_url" id="short_url" required="required" />
+				<button id="enlarge" type="submit">Get long URL</button>
 				<c:if test="${yausURL != null}" > 
 					<div>
 						<label>This is the long url: <a href="${yausURL.longURL}">${yausURL.longURL}</a></label>
@@ -54,11 +51,6 @@
 						<label>${enlarge_error}</label> 
 					</div> 
 				</c:if> 
-			</div>
-			<div class="actions">
-				<div class="action">
-					<button id="enlarge" type="submit">Enlarge It!</button>
-				</div>
 			</div>
 		</form>
 	</div>

@@ -35,14 +35,14 @@ public class DefaultYausService implements YausService {
 
 	@Override
 	public YausURL unveilURL(String key) {
-
-		YausURL yausURL = dao.getURL(key);
-		if (yausURL != null)
-			logger.info("URL registered for key {} is: {}",key,yausURL.getLongURL());
-		
-		return yausURL;
+		return dao.getURL(key);
 	}
 
+	
+	
+	/*
+	 * private methods -----------------
+	 */
 	
 	/**
 	 * Generates a new key from a random UUID and a Base36 encoding 
@@ -64,5 +64,5 @@ public class DefaultYausService implements YausService {
 		return urlValidator.isValid(url);
 	}
 	
- 
+  
 }
