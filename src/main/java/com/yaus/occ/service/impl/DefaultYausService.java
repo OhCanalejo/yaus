@@ -2,12 +2,13 @@ package com.yaus.occ.service.impl;
 
 import java.util.UUID;
 
+import org.apache.commons.validator.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import com.yaus.occ.HomeController;
+import com.yaus.occ.model.YausURL;
 import com.yaus.occ.persistence.RegistryDAO;
 import com.yaus.occ.service.YausService;
 
@@ -19,25 +20,27 @@ public class DefaultYausService implements YausService {
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 	
 	@Override
-	public String shortenURL(String url) {
+	public YausURL shortenURL(String url) {
+		
+		if (!this.validURL(url)) {
+			throw new IllegalArgumentException();
+		}
 		String key = this.generateKey();
 		logger.info("Result Base36 key: {}",key);
-		/*
-		 * TODO: Register URL with key (save it with corresponding DAO strategy)
-		 */
-		dao.registerURL(key, url);
-		return key;
+
+		YausURL yausURL = new YausURL(key, url);
+		dao.registerURL(yausURL);
+		return yausURL;
 	}
 
 	@Override
-	public String unveilURL(String key) {
-		/*
-		 * TODO Recover URL registered with key (if exists)
-		 * (Retrieve it from corresponding DAO strategy)
-		 */
-		String url = dao.getURL(key); 
-		logger.info("URL registered for key {} is: {}",key,url);		
-		return url;
+	public YausURL unveilURL(String key) {
+
+		YausURL yausURL = dao.getURL(key);
+		if (yausURL != null)
+			logger.info("URL registered for key {} is: {}",key,yausURL.getLongURL());
+		
+		return yausURL;
 	}
 
 	
@@ -51,14 +54,15 @@ public class DefaultYausService implements YausService {
 		return Long.toString(uuid.getMostSignificantBits(), 36);
 	}
 	
-//	private String Base36Encode(final long value) {
-//	    return Long.toString(value, 36);
-//	}
-//	
-//	private long Base36Decode(final String value) {
-//		return Long.parseLong(value, 36);
-//	}
+	/**
+	 * Validates a URL 
+	 * @param url
+	 * @return true if the URL is valid. False otherwise
+	 */
+	private boolean validURL(String url) {
+		UrlValidator urlValidator = new UrlValidator();
+		return urlValidator.isValid(url);
+	}
+	
  
-
-  
 }

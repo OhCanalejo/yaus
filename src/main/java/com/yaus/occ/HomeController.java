@@ -2,9 +2,12 @@ package com.yaus.occ;
 
 import java.util.Locale;
 
+import javax.servlet.ServletContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,9 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.yaus.occ.model.YausURL;
 import com.yaus.occ.service.YausService;
 
 /**
+ * Main Controller
  * @author oscar.canalejo
  *
  */
@@ -23,38 +28,42 @@ public class HomeController {
 	
 	@Autowired
 	YausService yausService;
+	@Autowired
+	ServletContext servletContext;
 	
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 	
 	/**
-	 * Home view
+	 * Home/Main view
 	 */
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String home(Locale locale, Model model) {
-		logger.info("at home!");
 		
-//		Date date = new Date();
-//		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
-//		String formattedDate = dateFormat.format(date);
-//		model.addAttribute("serverTime", formattedDate );
-		
+		logger.info("there's no place like home");
 		return "home";
 	}
 
 	
 	/**
-	 * Test shortened URL
+	 * Receives a short URL and 
+	 * Redirects to its related long URL.
+	 * (If key is found in our registry)
 	 * @param url
 	 * @return checks if URL is registered. If yes then redirects user to the original URL
 	 */
-	@RequestMapping(value = "/go", method = RequestMethod.GET)
-	public String testURL(Locale locale, @RequestParam(value="url") String url) {
+	@RequestMapping(value = "/{key}", method = RequestMethod.GET)
+	public String testURL(Locale locale, @PathVariable(value="key") String key) {
 		
-		logger.info("Test Requested for URL {}", url);
+		logger.info("Redirection Requested for long URL with key {}", key);
 		
-		String unveiledURL = yausService.unveilURL(url);
+		YausURL yausURL = yausService.unveilURL(key);
+		if (yausURL != null) {
+			yausURL.incrementClickCount();
+			return "redirect:" + yausURL.getLongURL();	
+		}else {
+			return "home";
+		}
 		
-		return "redirect:" + unveiledURL;
 	}
 	
 	/**
@@ -67,27 +76,34 @@ public class HomeController {
 							@RequestParam(value="url") String url) {
 		
 		logger.info("Shorten Requested for URL {}", url);
+		try {
+			YausURL yausURL = yausService.shortenURL(url);
+			model.addAttribute("shortenedURL", yausURL.getKey());
 		
-		String shortURL = yausService.shortenURL(url);
-		
-		model.addAttribute("shortenedURL", shortURL);
+		} catch (IllegalArgumentException ex) {
+			logger.error("Error occurred. {}",ex);
+			model.addAttribute("shorten_error", "Sorry. It doesn't seem a valid URL");
+		}
 		return "home";
 	}
 
 	/**
-	 * Receives a shortened URL and gets the unveiled original one  
-	 * @param url the shortened URL
+	 * Receives a shortened URL key and gets the original long one  
+	 * @param url the key for a shortened URL
 	 * @return the original, non shortened URL 
 	 */
-	@RequestMapping(value = "/unveil", method = RequestMethod.GET)
-	public String unveilURL(Locale locale, Model model, 
-							@RequestParam(value="url") String url) {
+	@RequestMapping(value = "/enlarge", method = RequestMethod.GET)
+	public String getLongURL(Locale locale, Model model, 
+							@RequestParam(value="key") String key) {
 		
-		logger.info("Unveiling Requested for URL {}", url);
+		logger.info("Enlarge Requested for key {}", key);
 		
-		String unveiledURL = yausService.unveilURL(url);
-		
-		model.addAttribute("unveiledURL", unveiledURL);
+		YausURL yausURL = yausService.unveilURL(key);
+		if (yausURL != null){
+			model.addAttribute("yausURL", yausURL);
+		} else {
+			model.addAttribute("enlarge_error", "Not Found");
+		}
 		return "home";
 	}
 	

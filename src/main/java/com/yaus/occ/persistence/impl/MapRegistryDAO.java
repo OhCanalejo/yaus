@@ -3,6 +3,7 @@ package com.yaus.occ.persistence.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.yaus.occ.model.YausURL;
 import com.yaus.occ.persistence.RegistryDAO;
 
 /**
@@ -13,24 +14,18 @@ import com.yaus.occ.persistence.RegistryDAO;
  */
 public class MapRegistryDAO implements RegistryDAO {
 
-	private static Map<String, String> urlRegistry = null;
+	private static Map<String, YausURL> urlRegistry = null;
 	
-	/* (non-Javadoc)
-	 * @see com.yaus.occ.persistence.URLRegistryDAO#registerURL(java.lang.String, java.lang.String)
-	 */
 	@Override
-	public void registerURL(String key, String url) {
+	public void registerURL(YausURL yausURL) {
 		if (urlRegistry == null) {
-			urlRegistry = new HashMap<String, String>();
+			urlRegistry = new HashMap<String, YausURL>();
 		}
-		urlRegistry.put(key, url);
+		urlRegistry.put(yausURL.getKey(), yausURL);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.yaus.occ.persistence.URLRegistryDAO#getURL(java.lang.String)
-	 */
 	@Override
-	public String getURL(String key) {
+	public YausURL getURL(String key) {
 		if (urlRegistry == null) {
 			return null;
 		}

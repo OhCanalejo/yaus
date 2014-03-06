@@ -1,10 +1,12 @@
 package com.yaus.occ.persistence;
 
+import com.yaus.occ.model.YausURL;
+
 public interface RegistryDAO {
 
 	
-	public void registerURL(String key, String url);
+	public void registerURL(YausURL yausURL);
 	
-	public String getURL(String key);
+	public YausURL getURL(String key);
 	
 }
