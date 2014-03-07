@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,8 +30,10 @@ public class HomeController {
 	@Autowired
 	YausService yausService;
 	
+	@Value( "${baseURL}" )
+	private String baseURL;
+	
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
-	private static final String BASE_URL = "http://127.0.0.1:8080";
 	
 	
 	/**
@@ -78,7 +81,7 @@ public class HomeController {
 		logger.info("Shorten Requested for URL {}", url);
 		try {
 			YausURL yausURL = yausService.shortenURL(url);
-			model.addAttribute("shortenedURL", BASE_URL +  
+			model.addAttribute("shortenedURL", baseURL +  
 					request.getContextPath() + "/" + yausURL.getKey());
 		
 		} catch (IllegalArgumentException ex) {

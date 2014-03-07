@@ -25,8 +25,16 @@
 	<context:component-scan base-package="com.yaus.occ" />
 <!--     <context:component-scan base-package="com.yaus.occ, com.yaus.occ.service, com.yaus.occ.persistence" /> -->
 	
+	<context:property-placeholder location="classpath:config.properties" />
+	
+	
 	<!-- Beans Definition -->
+	
+	<!-- YausService -->
 	<beans:bean id="yausService" class="com.yaus.occ.service.impl.DefaultYausService" />
-	<beans:bean id="registryDAO" class="com.yaus.occ.persistence.impl.MapRegistryDAO" />
+	<!-- RegistryDAO --> 
+	<!-- the class declared here will define the persistence strategy implementation to be injected -->
+	<!-- e.g.: class="com.yaus.occ.persistence.impl.HibernateRegistryDAO" /> -->
+	<beans:bean id="registryDAO" class="com.yaus.occ.persistence.impl.MapRegistryDAO" /> 
 	
 </beans:beans>
