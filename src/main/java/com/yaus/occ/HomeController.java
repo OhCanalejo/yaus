@@ -81,8 +81,7 @@ public class HomeController {
 		logger.info("Shorten Requested for URL {}", url);
 		try {
 			YausURL yausURL = yausService.shortenURL(url);
-			model.addAttribute("shortenedURL", baseURL +  
-					request.getContextPath() + "/" + yausURL.getKey());
+			model.addAttribute("shortenedURL", baseURL + request.getContextPath() + "/" + yausURL.getKey());
 		
 		} catch (IllegalArgumentException ex) {
 			logger.error("Error occurred. {}",ex);
@@ -119,7 +118,8 @@ public class HomeController {
 	private String extractKey(String contextPath, String url) {
 		try {
 			URI uri = new URI(url);
-			String key = uri.getPath().substring(contextPath.length()+1);
+			int index = url.indexOf(contextPath) + contextPath.length()+1;
+			String key = uri.getPath().substring(index);
 			return key;
 		} catch (Exception ex) {
 			logger.error("Error extracting key from url {} ",url,ex);
